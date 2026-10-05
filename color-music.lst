@@ -1,0 +1,109 @@
+D000  78                             SEI
+D001  D8                             CLD
+D002  A2 FF                          LDX #$FF
+D004  9A                             TXS
+D005  A9 00                          LDA #$00
+D007  8D 00 C0                       STA $C000
+D00A  8D 02 C0                       STA $C002
+D00D  8D 04 C0                       STA $C004
+D010  8D 08 C0                       STA $C008
+D013  8D 0C C0                       STA $C00C
+D016  2C 82 C0                       BIT $C082
+D019  2C 50 C0                       BIT $C050
+D01C  2C 52 C0                       BIT $C052
+D01F  2C 54 C0                       BIT $C054
+D022  2C 56 C0                       BIT $C056
+D025  2C 5F C0                       BIT $C05F
+D028  85 02                          STA $02
+D02A  85 04                          STA $04
+D02C  85 07                          STA $07
+D02E  20 00 D1                       JSR draw
+D031  A6 07                          LDX $07
+D033  BD 80 D3                       LDA delays,X
+D036  85 08                          STA $08
+D038  BD A0 D3                       LDA lengths_lo,X
+D03B  85 09                          STA $09
+D03D  BD C0 D3                       LDA lengths_hi,X
+D040  85 0A                          STA $0A
+D042  20 00 D2                       JSR tone
+D045  E6 02                          INC $02
+D047  E6 07                          INC $07
+D049  A5 07                          LDA $07
+D04B  29 07                          AND #$07
+D04D  D0 0C                          BNE same_pattern
+D04F  E6 04                          INC $04
+D051  A5 04                          LDA $04
+D053  C9 03                          CMP #$03
+D055  D0 04                          BNE same_pattern
+D057  A9 00                          LDA #$00
+D059  85 04                          STA $04
+D05B  A5 07                          LDA $07
+D05D  C9 20                          CMP #$20
+D05F  D0 CD                          BNE next_note
+D061  A9 00                          LDA #$00
+D063  85 07                          STA $07
+D065  4C 2E D0                       JMP next_note
+D100  A2 00                          LDX #$00
+D102  86 03                          STX $03
+D104  BD 00 D3                       LDA rows_lo,X
+D107  85 00                          STA $00
+D109  BD 18 D3                       LDA rows_hi,X
+D10C  85 01                          STA $01
+D10E  BD 30 D3                       LDA row_groups,X
+D111  85 05                          STA $05
+D113  A0 00                          LDY #$00
+D115  A5 04                          LDA $04
+D117  F0 09                          BEQ tiles
+D119  C9 01                          CMP #$01
+D11B  F0 0E                          BEQ bars
+D11D  A5 05                          LDA $05
+D11F  4C 2E D1                       JMP color
+D122  B9 48 D3                       LDA col_groups,Y
+D125  18                             CLC
+D126  65 05                          ADC $05
+D128  4C 2E D1                       JMP color
+D12B  B9 48 D3                       LDA col_groups,Y
+D12E  18                             CLC
+D12F  65 02                          ADC $02
+D131  29 0F                          AND #$0F
+D133  AA                             TAX
+D134  BD 70 D3                       LDA palette,X
+D137  91 00                          STA ($00),Y
+D139  C8                             INY
+D13A  C0 28                          CPY #$28
+D13C  D0 D7                          BNE column
+D13E  A6 03                          LDX $03
+D140  E8                             INX
+D141  E0 18                          CPX #$18
+D143  D0 BD                          BNE row
+D145  60                             RTS
+D200  2C 30 C0                       BIT $C030
+D203  A6 08                          LDX $08
+D205  CA                             DEX
+D206  D0 FD                          BNE wait
+D208  A5 09                          LDA $09
+D20A  D0 02                          BNE no_borrow
+D20C  C6 0A                          DEC $0A
+D20E  C6 09                          DEC $09
+D210  A5 09                          LDA $09
+D212  05 0A                          ORA $0A
+D214  D0 EA                          BNE tone
+D216  60                             RTS
+D217  40                             RTI
+D300  00 80 00 80 00 80 00 80 28 A8 28 A8 28 A8 28 A8 .byte $00, $80, $00, $80, $00, $80, $00, $80, $28, $A8, $28, $A8, $28, $A8, $28, $A8
+D310  50 D0 50 D0 50 D0 50 D0        .byte $50, $D0, $50, $D0, $50, $D0, $50, $D0
+D318  04 04 05 05 06 06 07 07 04 04 05 05 06 06 07 07 .byte $04, $04, $05, $05, $06, $06, $07, $07, $04, $04, $05, $05, $06, $06, $07, $07
+D328  04 04 05 05 06 06 07 07        .byte $04, $04, $05, $05, $06, $06, $07, $07
+D330  00 00 00 00 01 01 01 01 02 02 02 02 03 03 03 03 .byte $00, $00, $00, $00, $01, $01, $01, $01, $02, $02, $02, $02, $03, $03, $03, $03
+D340  04 04 04 04 05 05 05 05        .byte $04, $04, $04, $04, $05, $05, $05, $05
+D348  00 00 00 00 00 01 01 01 01 01 02 02 02 02 02 03 .byte $00, $00, $00, $00, $00, $01, $01, $01, $01, $01, $02, $02, $02, $02, $02, $03
+D358  03 03 03 03 04 04 04 04 04 05 05 05 05 05 06 06 .byte $03, $03, $03, $03, $04, $04, $04, $04, $04, $05, $05, $05, $05, $05, $06, $06
+D368  06 06 06 07 07 07 07 07        .byte $06, $06, $06, $07, $07, $07, $07, $07
+D370  11 99 DD CC 44 EE 66 22 33 77 FF BB AA 55 88 00 .byte $11, $99, $DD, $CC, $44, $EE, $66, $22, $33, $77, $FF, $BB, $AA, $55, $88, $00
+D380  BE 96 7D 5C 62 7D 96 7D E3 BE 96 6F 7D 96 BE 96 .byte $BE, $96, $7D, $5C, $62, $7D, $96, $7D, $E3, $BE, $96, $6F, $7D, $96, $BE, $96
+D390  8D E3 BE 8D 96 BE E3 BE FF C9 A9 7D 8D A9 C9 FF .byte $8D, $E3, $BE, $8D, $96, $BE, $E3, $BE, $FF, $C9, $A9, $7D, $8D, $A9, $C9, $FF
+D3A0  D2 08 3A A4 8C 3A 08 3A B0 D2 08 60 3A 08 D2 08 .byte $D2, $08, $3A, $A4, $8C, $3A, $08, $3A, $B0, $D2, $08, $60, $3A, $08, $D2, $08
+D3B0  18 B0 D2 18 08 D2 B0 D2 9C C6 EA 3A 18 EA C6 9C .byte $18, $B0, $D2, $18, $08, $D2, $B0, $D2, $9C, $C6, $EA, $3A, $18, $EA, $C6, $9C
+D3C0  00 01 01 01 01 01 01 01 00 00 01 01 01 01 00 01 .byte $00, $01, $01, $01, $01, $01, $01, $01, $00, $00, $01, $01, $01, $01, $00, $01
+D3D0  01 00 00 01 01 00 00 00 00 00 00 01 01 00 00 00 .byte $01, $00, $00, $01, $01, $00, $00, $00, $00, $00, $00, $01, $01, $00, $00, $00
+FFFA  17 D2 00 D0 17 D2              .word irq, reset, irq
